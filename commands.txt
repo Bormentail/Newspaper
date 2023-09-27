@@ -1,0 +1,94 @@
+>>> user1 = User.objects.create(username='Mike', first_name='Frank')
+>>> user2 = User.objects.create(username='NoMike', first_name='NoFrank') 
+
+>>> Author.objects.create(user=user1)
+<Author: Author object (1)>
+>>> Author.objects.create(user=user2)  
+<Author: Author object (2)>
+
+>>> Category.objects.create(name='IT') 
+<Category: Category object (1)>
+>>> Category.objects.create(name='Education')   
+<Category: Category object (2)>
+>>> Category.objects.create(name='Cat 3')          
+<Category: Category object (3)>
+>>> Category.objects.create(name='Cat 4')  
+<Category: Category object (4)>
+
+>>> Post.objects.create(author=Author.objects.get(user=User.objects.get(username='Mike')), post_type='NW', title='title 1', text='text 1')  
+<Post: Post object (1)>
+>>> Post.objects.create(author=Author.objects.get(user=User.objects.get(username='Mike')), post_type='AR', title='title 2', text='text 2')   
+<Post: Post object (2)>
+>>> Post.objects.create(author=Author.objects.get(user=User.objects.get(username='NoMike')), post_type='NW', title='title 3', text='text 3')   
+<Post: Post object (3)>
+>>> Post.objects.create(author=Author.objects.get(user=User.objects.get(username='NoMike')), post_type='AR', title='title 4', text='text 4')   
+<Post: Post object (4)>
+
+>>> p1 = Post.objects.get(pk=1)
+>>> p2 = Post.objects.get(pk=2)   
+>>> p3 = Post.objects.get(pk=3) 
+>>> p4 = Post.objects.get(pk=4)  
+>>> c1 = Category.objects.get(name='IT')  
+>>> c2 = Category.objects.get(name='Education')   
+>>> c3 = Category.objects.get(name='Cat 3')          
+>>> c4 = Category.objects.get(name='Cat 4')  
+>>> p1.category.add(c1)     
+>>> p2.category.add(c2)  
+>>> p3.category.add(c3)  
+>>> p4.category.add(c1, c2, c3, c4)
+
+>>> Comment.objects.create(user=User.objects.get(username='Mike'), post=Post.objects.get(pk=1), text='comment1')
+<Comment: Comment object (1)>
+>>> Comment.objects.create(user=User.objects.get(username='Mike'), post=Post.objects.get(pk=2), text='comment2')  
+<Comment: Comment object (2)>
+>>> Comment.objects.create(user=User.objects.get(username='NoMike'), post=Post.objects.get(pk=3), text='comment3')  
+<Comment: Comment object (3)>
+>>> Comment.objects.create(user=User.objects.get(username='NoMike'), post=Post.objects.get(pk=4), text='comment4')  
+<Comment: Comment object (4)>
+>>> Comment.objects.create(user=User.objects.get(username='Mike'), post=Post.objects.get(pk=3), text='comment5') 
+<Comment: Comment object (5)>
+
+
+>>> Post.objects.get(pk=1).like()
+>>> Post.objects.get(pk=2).like()  
+>>> Post.objects.get(pk=3).like()  
+>>> Post.objects.get(pk=4).like()  
+>>> Comment.objects.get(pk=1).like()     
+>>> Comment.objects.get(pk=2).like()  
+>>> Comment.objects.get(pk=3).dislike()
+>>> Comment.objects.get(pk=4).dislike()  
+>>> Comment.objects.get(pk=4).dislike()
+>>> Comment.objects.get(pk=4).dislike()
+>>> Comment.objects.get(pk=5).like()          
+
+>>> Author.objects.get(pk=1).update_rating()                         
+>>> Author.objects.get(pk=2).update_rating()  
+
+>>> best_author = Author.objects.all().order_by('-rating').first()
+>>> best_author.user.username
+'Mike'
+>>> best_author.rating                         
+9
+
+>>> best_post = Post.objects.filter(post_type='AR').order_by('-rating').first()
+>>> best_post.creation_datetime.strftime('%d/%m/%y')      
+'26/09/23'
+>>> best_post.author.user.username                        
+'Mike'
+>>> best_post.rating              
+1
+>>> best_post.title 
+'title 2'
+>>> best_post.preview()
+'text 2...'
+
+>>> for comment in Comment.objects.filter(post=best_post):
+...     comment.creation_datetime.strftime('%d/%m/%y')
+...     comment.user.username                              
+...     comment.rating                                     
+...     comment.text  
+... 
+'26/09/23'
+'Mike'
+1
+'comment2'
